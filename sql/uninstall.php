@@ -30,6 +30,7 @@
  * but does not want to loose all of the data associated to the module.
  */
 $sql = array();
+$sql[] = 'DROP TABLE IF EXISTS`'._DB_PREFIX_.'pointsfidelite`';
 
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {

@@ -23,11 +23,15 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
+
 $sql = array();
 
 $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'pointsfidelite` (
     `id_pointsfidelite` int(11) NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY  (`id_pointsfidelite`)
+    `id_customer` int,
+    `point` int,
+    `date_add` date,
+    PRIMARY KEY (`id_pointsfidelite`)
 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
 foreach ($sql as $query) {
