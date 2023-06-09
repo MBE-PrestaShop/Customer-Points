@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+    <name>pointsfidelite</name>
+    <displayName><![CDATA[Customer Points]]></displayName>
+    <version><![CDATA[1.0.0]]></version>
+    <description><![CDATA[Customer loyalty points generator]]></description>
+    <author><![CDATA[Mail Boxes ETC, Rep. Dominicana]]></author>
+    <tab><![CDATA[pricing_promotion]]></tab>
+    <is_configurable>1</is_configurable>
+    <need_instance>1</need_instance>
+</module>
