@@ -228,6 +228,11 @@ class Pointsfidelite extends Module
             }
         }
 
+        $this->smarty->assign([
+            'customerPoints' => floor($totalPoints),
+            //'url' => $this->context->link->getModuleLink('blockwishlist', 'action', ['action' => 'deleteProductFromWishlist']),
+          ]);
+
         // Renderiza el contenido en el área de la cuenta del cliente
         return $this->display(__FILE__, 'views/templates/hook/displayCustomerAccount.tpl');
     }
