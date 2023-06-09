@@ -28,7 +28,7 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-
+require_once __DIR__.'/classes/pointsfidelite/pointsfideliteentity.php';
 class Pointsfidelite extends Module
 {
     protected $config_form = false;
@@ -159,8 +159,8 @@ class Pointsfidelite extends Module
                         'type' => 'text',
                         'label' => $this->l('Points Conversion Rate'),
                         'name' => 'POINTS_CONVERSION_RATE',
-                        'desc' => $this->l('Specify the conversion rate of points to currency.'),
-                        'suffix' => $this->l('points = 1 currency unit'),
+                        'desc' => $this->l('Specify the conversion rate of currency to points.'),
+                        'suffix' => $this->l('currency unit = 1 point'),
                     ),
                     array(
                         'type' => 'text',
@@ -187,6 +187,49 @@ class Pointsfidelite extends Module
             'POINTS_CONVERSION_RATE' => Configuration::get('POINTS_CONVERSION_RATE', 1),
             'MIN_ORDER_AMOUNT' => Configuration::get('MIN_ORDER_AMOUNT', 0),
         );
+    }
+
+    public function hookDisplayCustomerAccount()
+    {
+        $pointsEnabled = Configuration::get('POINTS_SYSTEM_ENABLED');
+        $conversionRate = Configuration::get('POINTS_CONVERSION_RATE');
+        $minOrderAmount = Configuration::get('MIN_ORDER_AMOUNT');
+
+        if ($pointsEnabled) {
+            // Verificar si el cliente ha realizado un pedido válido
+            $customerId = $this->context->customer->id;
+            $orders = Order::getCustomerOrders($customerId);
+            $totalPoints = 0;
+
+            foreach ($orders as $order) {
+                if ($order['valid']) {
+                    // Calcular los puntos basados en el monto de la orden
+                    $orderAmount = (float) $order['total_paid_tax_incl'];
+                    if ($orderAmount >= $minOrderAmount) {
+                        //echo $orderAmount;
+                        $points = $orderAmount / $conversionRate;
+                        $totalPoints += $points;
+                    }
+                }
+            }
+            
+            $customerPoints = new pointsfideliteEntity();
+            
+            // Guardar o actualizar los puntos en la tabla pointsfidelite
+            $existingPoints = Db::getInstance()->getValue("SELECT * FROM `" . _DB_PREFIX_ . "pointsfidelite` WHERE `id_customer` = " . (int)$customerId);
+            if($existingPoints !== false){
+               // Actualizar los puntos existentes
+                Db::getInstance()->execute("UPDATE `" . _DB_PREFIX_ . "pointsfidelite` SET `point` = " . floor($totalPoints) . " WHERE `id_customer` = " . (int)$customerId);
+
+            }else{
+                $customerPoints->id_customer = $customerId;
+                $customerPoints->point = floor($totalPoints);
+                $customerPoints->save();
+            }
+        }
+
+        // Renderiza el contenido en el área de la cuenta del cliente
+        return $this->display(__FILE__, 'views/templates/hook/displayCustomerAccount.tpl');
     }
 
     /**
